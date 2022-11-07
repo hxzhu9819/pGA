@@ -1,2 +1,3 @@
-markdown: kramdown
-theme: Cayman
+theme: jekyll-theme-cayman
+title: "Parallelizing Genetic Algorithm for Traveling Salesman Problem"
+description: by Haoxuan Zhu (haoxuanz) and Ziyi Liu (ziyiliu)

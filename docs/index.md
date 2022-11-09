@@ -1,3 +1,5 @@
+# Parallelizing Genetic Algorithm for Traveling Salesman Problem
+
 ## Summary
 We are going to implement and benchmark different parallelizing strategies, including openMP and CUDA, to accelerate the genetic algorithm for solving the traveling salesman problem.
 

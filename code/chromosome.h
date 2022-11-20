@@ -39,7 +39,7 @@ bool worsethan(Chromosome c1, Chromosome c2) {
 
 Chromosome::Chromosome(int size) {
     this->size = size;
-    cout << "chromosome::constructor is called" << endl;
+    // cout << "chromosome::constructor is called" << endl;
 }
 
 Chromosome::Chromosome(const Chromosome &t) {

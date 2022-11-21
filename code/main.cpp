@@ -242,7 +242,7 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
 }
 
 int main() {
-    vector<vector<int>> map = load_tsp_from_file("testcase/11.txt");
+    vector<vector<int>> map = load_tsp_from_file("testcase/30.txt");
     #ifdef DEBUG
     for(int i = 0; i < map.size(); ++i) {
         for (int j = 0; j < map[i].size(); ++j) {

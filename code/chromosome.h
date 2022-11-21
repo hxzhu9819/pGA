@@ -6,13 +6,26 @@
 #include <sstream>
 #include <string.h>
 #include <stdlib.h>
+#include <vector>
+#include <random>
 using namespace std;
 
 int rand_num_from_range(int start, int end) {
     return start + rand() % (end - start);
+    // std::random_device rd;
+    // std::mt19937 gen(rd());
+    // std::uniform_int_distribution<> dis(start, end-1);
+    // return dis(gen);
 }
 
-bool repeat(string s, char c) {
+// bool repeat(string s, char c) {
+//     for (auto sc : s) {
+//         if (sc == c) return true;
+//     }
+//     return false;
+// }
+
+bool repeat(vector<int> s, int c) {
     for (auto sc : s) {
         if (sc == c) return true;
     }
@@ -22,15 +35,18 @@ bool repeat(string s, char c) {
 class Chromosome {
     private:
         string gnome;
-        int size;
+        vector<int> gnome_vec;
     public:
         int fitness;
+        int size;
         Chromosome(int size);
         Chromosome(const Chromosome &t);
         void create();
         void reset();
-        string mutate();
+        void cross_over(Chromosome& x, Chromosome& y, int p);
+        vector<int> mutate();
         string get_gnome();
+        vector<int> get_gnome_vec();
 };
 
 bool worsethan(Chromosome c1, Chromosome c2) {
@@ -44,38 +60,98 @@ Chromosome::Chromosome(int size) {
 
 Chromosome::Chromosome(const Chromosome &t) {
     gnome = t.gnome;
+    gnome_vec = t.gnome_vec;
     size = t.size;
     fitness = t.fitness;
 }
 
 string Chromosome::get_gnome() {
-    return gnome;
+    string gnome_str = "";
+    for (int i = 0; i < gnome_vec.size(); ++i) {
+        gnome_str += to_string(gnome_vec[i]);
+        gnome_str += "->";
+        // cout << "gnome_str: " << gnome_str << endl;
+    }
+    return gnome_str;
+}
+
+vector<int> Chromosome::get_gnome_vec() {
+    return gnome_vec;
 }
 
 void Chromosome::create() {
-    gnome = "0";
+    vector<int> g_vec;
+    g_vec.push_back(0);
     while (true) {
-        if (gnome.size() == size) {
-            gnome += gnome[0];
+        if (g_vec.size() == size) {
+            g_vec.push_back(g_vec[0]);
             break;
         }
         int tmp = rand_num_from_range(1, size);
-        if (!repeat(gnome, (char)(tmp+48))) {
-            gnome += (char)(tmp + 48);
+        if (!repeat(g_vec, tmp)) {
+            g_vec.push_back(tmp);
         }
-    } 
+    }
+    // for (auto i: g_vec)
+    //     std::cout << i << ' ';
+    // cout << endl;
+    gnome_vec = g_vec;
 }
 
-string Chromosome::mutate() {
+void Chromosome::cross_over(Chromosome& x, Chromosome& y, int p) {
+    vector<int> parent1_gnome_vec = x.get_gnome_vec();
+    vector<int> parent2_gnome_vec = y.get_gnome_vec();
+    vector<int> new_chro;
+    new_chro.resize(x.size+1, 0);
+    
+    // cout <<"p1: ";
+    // for(auto x: parent1_gnome_vec) {
+    //     cout << x << " ";
+    // }
+    // cout << endl;
+
+    // cout <<"p2: ";
+    // for(auto x: parent2_gnome_vec) {
+    //     cout << x << " ";
+    // }
+    // cout << endl;
+
+    int g_idx = 1;
+    for (int i = 1; i < p; i++) {
+        new_chro[g_idx] = parent1_gnome_vec[i];
+        g_idx++;
+    }
+
+    // cout << "[CV] pivot " << p << endl;
+    // for(auto x : new_chro) {
+    //     cout << x << " ";
+    // }
+    // cout << endl;
+
+    int i = 1;
+    while (g_idx < x.size) {
+        if (find(new_chro.begin(), new_chro.end(), parent2_gnome_vec[i]) == new_chro.end()) {
+            // cout << parent2_gnome_vec[i] << endl;
+            new_chro[g_idx++] = parent2_gnome_vec[i++];
+        } else {
+            i++;
+        }
+    }
+    new_chro[g_idx] = 0;
+    gnome_vec = new_chro;
+    // cout << "CROSSOVER ONE DONE" <<endl;
+}
+
+vector<int> Chromosome::mutate() {
     while (true) {
         int victim_gene1 = rand_num_from_range(1, size);
         int victim_gene2 = rand_num_from_range(1, size);
         if (victim_gene1 != victim_gene2) {
-            char tmp = gnome[victim_gene1];
-            gnome[victim_gene1] = gnome[victim_gene2];
-            gnome[victim_gene2] = tmp;
+            int tmp = gnome_vec[victim_gene1];
+            gnome_vec[victim_gene1] = gnome_vec[victim_gene2];
+            gnome_vec[victim_gene2] = tmp;
             break;
         }
     }
-    return gnome;
+    return gnome_vec;
 } 

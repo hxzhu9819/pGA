@@ -1,5 +1,6 @@
 #include "brute_force.h"
 #include <map>
+#include <bits/stdc++.h>
 
 using namespace std;
 

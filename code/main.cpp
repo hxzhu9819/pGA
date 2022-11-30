@@ -12,9 +12,9 @@
 using namespace std;
 
 #define GEN_THRES 100
-#define POPULATION_SIZE 50000
-#define MATING_SIZE  (POPULATION_SIZE / 100)
-#define TOLERANCE 5
+#define POPULATION_SIZE 20000
+#define MATING_SIZE  (POPULATION_SIZE / 500)
+#define TOLERANCE 80
 // #define DEBUG
 
 vector<vector<int>> load_tsp_from_file(string filename) {
@@ -44,7 +44,7 @@ int cooldown(int temp)
     return (999 * temp) / 1000;
 }
 
-int cal_fitness(vector<vector<int>> map, vector<int> gnome)
+int cal_fitness(vector<vector<int>>& map, vector<int> gnome)
 {   
     // cout << "cal_fitness() is called" << endl;
     // cout << gnome << endl;
@@ -71,17 +71,51 @@ int uniform_rand(int start, int end) {
     return res;
 }
 
-void cross_over(vector<Chromosome>& mating_pop, Chromosome& chro1, Chromosome& chro2) {
+int get_next_node(int& next_node, vector<vector<int>>& map, Chromosome& parent, int curr_node) {
+    vector<int> route = parent.get_gnome_vec();
+    for (int i = 0; i < route.size(); ++i) {
+        if (route[i] != curr_node) {
+            continue;
+        }
+        else {
+            continue;
+        }
+    }
+    return 0;
+}
+
+void cross_over(vector<Chromosome>& mating_pop, Chromosome& chro1, Chromosome& chro2, vector<vector<int>>& map) {
     int idx1 = uniform_rand(0, mating_pop.size());
     int idx2 = uniform_rand(0, mating_pop.size());
     int pos = uniform_rand(1, chro1.size);
-    chro1.cross_over(mating_pop[idx1], mating_pop[idx2], pos);
-    chro2.cross_over(mating_pop[idx2], mating_pop[idx1], pos);
+    chro1.cross_over(mating_pop[idx1], mating_pop[idx2], pos, map);
+    chro2.cross_over(mating_pop[idx2], mating_pop[idx1], pos, map);
 }
 
 void mutation(Chromosome& chro) {
     chro.mutate();
 
+}
+
+vector<Chromosome> selection_tournament(vector<Chromosome>& pop, int mating_size) {
+    vector<Chromosome> mating_pop;
+    int tournament_size = 25;
+    for (int i = 0; i < mating_size; ++i) {
+        Chromosome best_chro = pop[0];
+        int best_fitness = INT_MAX;
+
+        for (int j = 0; j < tournament_size; ++j) {
+            // int victim = uniform_rand(0, pop.size());
+            int victim = 0 + rand() % (pop.size());
+            if (pop[victim].fitness < best_fitness) {
+                best_fitness = pop[victim].fitness;
+                best_chro = pop[victim];
+            }
+        }
+        mating_pop.push_back(best_chro);
+    }
+    
+    return mating_pop;
 }
 
 vector<Chromosome> selection(vector<Chromosome>& pop, int mating_size) {
@@ -96,7 +130,7 @@ vector<Chromosome> selection(vector<Chromosome>& pop, int mating_size) {
         fitness_sum += pop[i].fitness;
     }
     fitness_avg = fitness_sum / pop.size();
-    int fitness_thres = 1.5*fitness_avg+1;
+    int fitness_thres = 0.25*fitness_avg+1;
 
     for (int j = 0; j < pop.size(); j++) {
         if (fitness_avg > pop[j].fitness) {
@@ -115,7 +149,7 @@ vector<Chromosome> selection(vector<Chromosome>& pop, int mating_size) {
     return mating_pop;
 }
 
-vector<Chromosome> selection_by_sort(vector<Chromosome>& population) {
+vector<Chromosome> selection_by_sort(vector<Chromosome>& population) { // Abandoned
     vector<Chromosome> mating_pop;
     sort(population.begin(), population.end(), worsethan);
     for (int i = 0; i < MATING_SIZE; ++i) {
@@ -150,7 +184,17 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
     while (gen <= gen_thres) {
         // selection
         vector<Chromosome> mating_pop;
-        mating_pop = selection(population, MATING_SIZE);
+        // mating_pop = selection(population, MATING_SIZE);
+        mating_pop = selection_tournament(population, MATING_SIZE);
+
+        cout << "Mating Pop:" <<endl;
+        vector<int> cnter;
+        cnter.resize(num_node, 0);
+        for (auto c: mating_pop) {
+            cnter[c.get_gnome_vec()[1]]++;
+        }
+        for (auto x: cnter) cout << x << " ";
+        cout <<endl;
 
         // cout << "Mating Pop:" <<endl;
         // for(auto x:mating_pop) {
@@ -167,7 +211,7 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
             chro1.create();
             chro2.create();
 
-            cross_over(mating_pop, chro1, chro2);
+            cross_over(mating_pop, chro1, chro2, map);
             #ifdef DEBUG
             cout << chro1.get_gnome() <<endl;
             cout << chro2.get_gnome() <<endl;
@@ -175,15 +219,13 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
             #endif
 
             // mutation
-            if (uniform_rand(0, 100) < 50) {
+            if (uniform_rand(0, 10) < 2) {
                 // cout << "MUTATION happened" <<endl;
-                chro1.mutate();
+                chro1.mutate_by_invert();
             }
-            if (uniform_rand(0, 100) < 30) {
+            if (uniform_rand(0, 10) < 2) {
                 // cout << "STRONG MUTATION happened" <<endl;
-                chro2.mutate();
-                chro2.mutate();
-                chro2.mutate();
+                chro2.mutate_by_invert();
             }
             #ifdef DEBUG
             cout << chro1.get_gnome() <<endl;
@@ -203,7 +245,9 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
                 best_seen_fitness = new_population[i].fitness;
             }
         }
-        new_population.push_back(best_seen_chro);
+        // Chromosome mutated_best_seen_chro = best_seen_chro;
+        // mutated_best_seen_chro.mutate_by_invert();
+        // new_population.push_back(mutated_best_seen_chro);
         population = new_population;
         
 
@@ -242,7 +286,7 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
 }
 
 int main() {
-    vector<vector<int>> map = load_tsp_from_file("testcase/30.txt");
+    vector<vector<int>> map = load_tsp_from_file("testcase/11.txt");
     #ifdef DEBUG
     for(int i = 0; i < map.size(); ++i) {
         for (int j = 0; j < map[i].size(); ++j) {

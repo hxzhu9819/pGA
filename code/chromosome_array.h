@@ -25,18 +25,16 @@ int rand_num_from_range(int start, int end) {
 //     return false;
 // }
 
-bool repeat(vector<int> s, int c) {
-    for (auto sc : s) {
-        if (sc == c) return true;
+bool repeat(int s[], size_t size, int c) {
+    for (int i = 0; i < size; ++i) {
+        if (s[i] == c) return true;
     }
     return false;
 }
 
 class Chromosome {
-    private:
-        string gnome;
-        vector<int> gnome_vec;
     public:
+        int* gnome_vec;
         int fitness;
         int size; // number of city
         Chromosome(int size);
@@ -44,10 +42,10 @@ class Chromosome {
         void create();
         void reset();
         // void cross_over(Chromosome& x, Chromosome& y, int p);
-        void cross_over(Chromosome& x, Chromosome& y, int p, vector<vector<int>>& map);
-        vector<int> mutate();
+        void cross_over(Chromosome& x, Chromosome& y, int p, int** map);
+        int* mutate();
         string get_gnome();
-        vector<int> get_gnome_vec();
+        int* get_gnome_vec();
         void mutate_by_invert();
 };
 
@@ -57,19 +55,22 @@ bool worsethan(Chromosome c1, Chromosome c2) {
 
 Chromosome::Chromosome(int size) {
     this->size = size;
+    this->gnome_vec = new int[size+1]{0};
     // cout << "chromosome::constructor is called" << endl;
 }
 
 Chromosome::Chromosome(const Chromosome &t) {
-    gnome = t.gnome;
-    gnome_vec = t.gnome_vec;
     size = t.size;
+    gnome_vec = new int[size+1];
+    for (int i = 0; i < size; ++i) {
+        gnome_vec[i] = t.gnome_vec[i];
+    }
     fitness = t.fitness;
 }
 
 string Chromosome::get_gnome() {
     string gnome_str = "";
-    for (int i = 0; i < gnome_vec.size(); ++i) {
+    for (int i = 0; i < size; ++i) {
         gnome_str += to_string(gnome_vec[i]);
         gnome_str += "->";
         // cout << "gnome_str: " << gnome_str << endl;
@@ -82,67 +83,59 @@ vector<int> Chromosome::get_gnome_vec() {
 }
 
 void Chromosome::create() {
-    vector<int> g_vec;
-    g_vec.push_back(0);
-    while (true) {
-        if (g_vec.size() == size) {
-            g_vec.push_back(g_vec[0]);
-            break;
-        }
+    gnome_vec[0] = 0;
+    for(int i = 1;i < size; ++i) {
         int tmp = rand_num_from_range(1, size);
-        if (!repeat(g_vec, tmp)) {
-            g_vec.push_back(tmp);
+        while (repeat(gnome_vec, size, tmp)) {
+            tmp = rand_num_from_range(1, size);
+        }
+        gnome_vec[i] = tmp;
+    }
+    gnome_vec[size] = 0;
+}
+
+int get_index(int* v, int length, int val) {
+    for (int i = 0; i < length; i++){
+        if (v[i] == val){
+            return i;
         }
     }
-    // for (auto i: g_vec)
-    //     std::cout << i << ' ';
-    // cout << endl;
-    gnome_vec = g_vec;
+    return -1;
 }
 
-int get_index(vector<int> v, int val) {
-    auto it = find(v.begin(), v.end(), val);
-    if (it == v.end()) {
-        return -1;
-    } else {
-        return int(it - v.begin());
-    }
-}
-
-void Chromosome::cross_over(Chromosome& x, Chromosome& y, int p, vector<vector<int>>& map) {
-    vector<int> parent1_gnome_vec = x.get_gnome_vec();
-    vector<int> parent2_gnome_vec = y.get_gnome_vec();
-    vector<int> new_chro;
-    new_chro.resize(size+1, 0);
+void Chromosome::cross_over(Chromosome& x, Chromosome& y, int p, int** map) {
+    int* parent1_gnome_vec = x.get_gnome_vec();
+    int* parent2_gnome_vec = y.get_gnome_vec();
+    gnome_vec[0] = 0;
+    gnome_vec[size] = 0;
     for (int i = 1; i < size; ++i) {
         int gnome_from_p1, gnome_from_p2;
-        int p1_cand_idx = get_index(parent1_gnome_vec, new_chro[i-1])+1;
+        int p1_cand_idx = get_index(parent1_gnome_vec, size, gnome_vec[i-1])+1;
         int p1_cand = parent1_gnome_vec[p1_cand_idx];
-        if (p1_cand == 0 || get_index(new_chro, p1_cand) != -1) {
+        if (p1_cand == 0 || get_index(gnome_vec, i, p1_cand) != -1) {
             for (int j = 1; j < size; ++j) {
-                if (get_index(new_chro, j) == -1) {
+                if (get_index(gnome_vec, i, j) == -1) {
                     p1_cand = j;
                     break;
                 }
             }
         }
         // p2
-        int p2_cand_idx = get_index(parent2_gnome_vec, new_chro[i-1])+1;
+        int p2_cand_idx = get_index(parent2_gnome_vec, gnome_vec[i-1])+1;
         int p2_cand = parent2_gnome_vec[p2_cand_idx];
-        if (p2_cand == 0 || get_index(new_chro, p2_cand) != -1) {
+        if (p2_cand == 0 || get_index(gnome_vec, i, p2_cand) != -1) {
             for (int j = 1; j < size; ++j) {
-                if (get_index(new_chro, j) == -1) {
+                if (get_index(new_chro, i, j) == -1) {
                     p2_cand = j;
                     break;
                 }
             }
         }
         // compete
-        int p1_fitness = map[new_chro[i-1]][p1_cand];
-        int p2_fitness = map[new_chro[i-1]][p2_cand];
-        new_chro[i] = p1_fitness <= p2_fitness ? p1_cand : p2_cand;
+        int p1_fitness = map[gnome_vec[i-1]][p1_cand];
+        int p2_fitness = map[gnome_vec[i-1]][p2_cand];
+        gnome_vec[i] = p1_fitness <= p2_fitness ? p1_cand : p2_cand;
     }
-    gnome_vec = new_chro;
 }
 
 // void Chromosome::cross_over(Chromosome& x, Chromosome& y, int p) {

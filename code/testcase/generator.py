@@ -1,3 +1,5 @@
+# python generator.py <outputfilename> <dimension>
+# https://www.math.uwaterloo.ca/tsp/world/countries.html
 import math
 import random 
 import sys

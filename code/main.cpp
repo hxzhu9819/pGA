@@ -12,9 +12,9 @@
 using namespace std;
 
 #define GEN_THRES 100
-#define POPULATION_SIZE 20000
+#define POPULATION_SIZE 10000
 #define MATING_SIZE  (POPULATION_SIZE / 500)
-#define TOLERANCE 80
+#define TOLERANCE 10
 // #define DEBUG
 
 vector<vector<int>> load_tsp_from_file(string filename) {
@@ -286,7 +286,7 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
 }
 
 int main() {
-    vector<vector<int>> map = load_tsp_from_file("testcase/11.txt");
+    vector<vector<int>> map = load_tsp_from_file("testcase/30.txt");
     #ifdef DEBUG
     for(int i = 0; i < map.size(); ++i) {
         for (int j = 0; j < map[i].size(); ++j) {
@@ -298,8 +298,8 @@ int main() {
     solver(map, GEN_THRES, POPULATION_SIZE);
 
     // control group
-    string ans_str = "";
-	cout << "brute_force result: " << travllingSalesmanProblem(map, 0, ans_str) << " " << ans_str << endl;
+    // string ans_str = "";
+	// cout << "brute_force result: " << travllingSalesmanProblem(map, 0, ans_str) << " " << ans_str << endl;
     // cout << "greedy result: " << tsp_greedy(map) << endl; // not correct
     return 0;
 }

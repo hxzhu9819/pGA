@@ -1,5 +1,4 @@
 .DS_Store
-code/testcase/*
 code/5.txt
 code/*.dSYM/*
 .vscode/*

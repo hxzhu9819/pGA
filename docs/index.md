@@ -5,6 +5,8 @@ We are going to implement and benchmark different parallelizing strategies, incl
 
 ## Proposal
 [Proposal](https://hxzhu9819.github.io/pGA/proposal)
+
+## Milestone Report
 [Milestone Report](https://hxzhu9819.github.io/pGA/milestone)
 
 

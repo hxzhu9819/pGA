@@ -28,51 +28,51 @@ Each approach is stored in its own folder (cuda, openmp, seq_improved, seq), to 
 │   ├── cuda.cu  
 │   └── objs  
 │       └── cuda.o  
-├── openmp
-│   ├── Makefile
-│   ├── brute_force.cpp
-│   ├── brute_force.h
-│   ├── chromosome.h
-│   ├── genetic-alg
-│   ├── main.cpp
-│   └── openmp-alg
-├── openmp-fail1
-│   ├── Makefile
-│   ├── chromosome.h
-│   ├── main.cpp
-│   └── openmp-alg
-├── seq_improved
-│   ├── Makefile
-│   ├── brute_force.cpp
-│   ├── brute_force.h
-│   ├── chromosome.h
-│   ├── genetic-alg
-│   └── main.cpp
-├── seq_vec
-│   ├── Makefile
-│   ├── brute_force.cpp
-│   ├── brute_force.h
-│   ├── chromosome.h
-│   ├── genetic-alg
-│   └── main.cpp
-└── testcase
-    ├── 100.txt
-    ├── 11.txt
-    ├── 12.txt
-    ├── 13.txt
-    ├── 20.txt
-    ├── 30.txt
-    ├── 4.txt
-    ├── 5.txt
-    ├── 6.txt
-    ├── 7.txt
-    ├── 8.txt
-    ├── 9.txt
-    ├── dj38.tsp
-    ├── dj38.txt
-    ├── generator.py
-    ├── qa194.tsp
-    ├── qa194.txt
-    ├── tsplib_loader.py
-    ├── uy734.tsp
-    └── uy734.txt
+├── openmp  
+│   ├── Makefile  
+│   ├── brute_force.cpp  
+│   ├── brute_force.h  
+│   ├── chromosome.h  
+│   ├── genetic-alg  
+│   ├── main.cpp  
+│   └── openmp-alg  
+├── openmp-fail1  
+│   ├── Makefile  
+│   ├── chromosome.h  
+│   ├── main.cpp  
+│   └── openmp-alg  
+├── seq_improved  
+│   ├── Makefile  
+│   ├── brute_force.cpp  
+│   ├── brute_force.h  
+│   ├── chromosome.h  
+│   ├── genetic-alg  
+│   └── main.cpp  
+├── seq_vec  
+│   ├── Makefile  
+│   ├── brute_force.cpp  
+│   ├── brute_force.h  
+│   ├── chromosome.h  
+│   ├── genetic-alg  
+│   └── main.cpp  
+└── testcase  
+    ├── 100.txt  
+    ├── 11.txt  
+    ├── 12.txt  
+    ├── 13.txt  
+    ├── 20.txt  
+    ├── 30.txt  
+    ├── 4.txt  
+    ├── 5.txt  
+    ├── 6.txt  
+    ├── 7.txt  
+    ├── 8.txt  
+    ├── 9.txt  
+    ├── dj38.tsp  
+    ├── dj38.txt  
+    ├── generator.py  
+    ├── qa194.tsp  
+    ├── qa194.txt  
+    ├── tsplib_loader.py  
+    ├── uy734.tsp  
+    └── uy734.txt  

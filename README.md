@@ -19,15 +19,15 @@ Each approach is stored in its own folder (cuda, openmp, seq_improved, seq), to 
 2. python3 tsplib_loader.py inputfile.tsp outputfilename dimension
 
 ## File organization
-.
-├── brute_force.cpp
-├── brute_force.h
-├── cuda
-│   ├── CycleTimer.h
-│   ├── Makefile
-│   ├── cuda.cu
-│   └── objs
-│       └── cuda.o
+.  
+├── brute_force.cpp  
+├── brute_force.h  
+├── cuda  
+│   ├── CycleTimer.h  
+│   ├── Makefile  
+│   ├── cuda.cu  
+│   └── objs  
+│       └── cuda.o  
 ├── openmp
 │   ├── Makefile
 │   ├── brute_force.cpp

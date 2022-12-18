@@ -1,11 +1,11 @@
 CFLAGS := -std=c++14 -lpthread
 
-CFLAGS += -O3 -fopenmp
+CFLAGS += -O2 -fopenmp
 
 SOURCES := ./*.cpp
 HEADERS := ./*.h
 
-TARGETBIN := genetic-alg
+TARGETBIN := openmp-alg
 
 .SUFFIXES:
 .PHONY: all clean

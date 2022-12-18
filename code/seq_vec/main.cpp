@@ -6,15 +6,19 @@
 #include <vector>
 #include <cmath>
 #include <random>
+#include <chrono>
 
 #include "brute_force.h"
 
 using namespace std;
+using namespace std::chrono;
 
-#define GEN_THRES 100
-#define POPULATION_SIZE 10000
-#define MATING_SIZE  (POPULATION_SIZE / 500)
-#define TOLERANCE 10
+#define GEN_THRES 2000
+#define POPULATION_SIZE 50000
+#define TOURNAMENT_SIZE 8
+#define MATING_SIZE  1000 //(POPULATION_SIZE / 10)
+#define TOLERANCE 2000
+#define TESTFILE "../testcase/dj38.txt"
 // #define DEBUG
 
 vector<vector<int>> load_tsp_from_file(string filename) {
@@ -46,16 +50,12 @@ int cooldown(int temp)
 
 int cal_fitness(vector<vector<int>>& map, vector<int> gnome)
 {   
-    // cout << "cal_fitness() is called" << endl;
-    // cout << gnome << endl;
     int f = 0;
     for (int i = 0; i < gnome.size() - 1; i++) {
         if (map[gnome[i]][gnome[i + 1]] == INT_MAX) {
-            // cout << "INT_MAX" << endl;
             return INT_MAX;
         }
         f += map[gnome[i]][gnome[i + 1]];
-        // cout << "f: " << f << endl;
     }
     return f;
 }
@@ -71,35 +71,20 @@ int uniform_rand(int start, int end) {
     return res;
 }
 
-int get_next_node(int& next_node, vector<vector<int>>& map, Chromosome& parent, int curr_node) {
-    vector<int> route = parent.get_gnome_vec();
-    for (int i = 0; i < route.size(); ++i) {
-        if (route[i] != curr_node) {
-            continue;
-        }
-        else {
-            continue;
-        }
-    }
-    return 0;
-}
-
-void cross_over(vector<Chromosome>& mating_pop, Chromosome& chro1, Chromosome& chro2, vector<vector<int>>& map) {
+void cross_over(vector<Chromosome>& mating_pop, Chromosome& chro1, vector<vector<int>>& map) {
     int idx1 = uniform_rand(0, mating_pop.size());
     int idx2 = uniform_rand(0, mating_pop.size());
     int pos = uniform_rand(1, chro1.size);
     chro1.cross_over(mating_pop[idx1], mating_pop[idx2], pos, map);
-    chro2.cross_over(mating_pop[idx2], mating_pop[idx1], pos, map);
 }
 
 void mutation(Chromosome& chro) {
     chro.mutate();
-
 }
 
 vector<Chromosome> selection_tournament(vector<Chromosome>& pop, int mating_size) {
     vector<Chromosome> mating_pop;
-    int tournament_size = 25;
+    int tournament_size = TOURNAMENT_SIZE;
     for (int i = 0; i < mating_size; ++i) {
         Chromosome best_chro = pop[0];
         int best_fitness = INT_MAX;
@@ -162,12 +147,18 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
     int gen = 1;
     int num_node = map.size();
     vector<Chromosome> population;
+    auto start_time = high_resolution_clock::now();
     for (int i = 0; i < pop_size; ++i) {
         Chromosome chro = Chromosome(num_node);
         chro.create();
         chro.fitness = cal_fitness(map, chro.get_gnome_vec());
         population.push_back(chro);
     }
+    auto end_time = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(end_time - start_time);
+    cout << "Time taken by Initialization: "
+         << duration.count() << " microseconds" << endl;
+
     Chromosome best_seen_chro = population[0];
     int best_seen_fitness = INT_MAX;
     int prev_best_fitness = INT_MAX;
@@ -183,18 +174,22 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
     cout << "Generation " << gen << " \n";
     while (gen <= gen_thres) {
         // selection
+        auto start_time_0 = high_resolution_clock::now();
         vector<Chromosome> mating_pop;
         // mating_pop = selection(population, MATING_SIZE);
         mating_pop = selection_tournament(population, MATING_SIZE);
-
-        cout << "Mating Pop:" <<endl;
-        vector<int> cnter;
-        cnter.resize(num_node, 0);
-        for (auto c: mating_pop) {
-            cnter[c.get_gnome_vec()[1]]++;
-        }
-        for (auto x: cnter) cout << x << " ";
-        cout <<endl;
+        end_time = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(end_time - start_time_0);
+        cout << "Time taken by SELECTION: "
+            << duration.count() << " microseconds" << endl;
+        // cout << "Mating Pop:" <<endl;
+        // vector<int> cnter;
+        // cnter.resize(num_node, 0);
+        // for (auto c: mating_pop) {
+        //     cnter[c.get_gnome_vec()[1]]++;
+        // }
+        // for (auto x: cnter) cout << x << " ";
+        // cout <<endl;
 
         // cout << "Mating Pop:" <<endl;
         // for(auto x:mating_pop) {
@@ -203,41 +198,44 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
         // cout << "SELECTION done " << endl;
 
         // evoluation
+        start_time = high_resolution_clock::now();
         vector<Chromosome> new_population;
-        for (int i = 0; i < POPULATION_SIZE; i+=2) {
+        for (int i = 0; i < POPULATION_SIZE; i+=1) {
             // cross-over
             Chromosome chro1 = Chromosome(num_node);
-            Chromosome chro2 = Chromosome(num_node);
             chro1.create();
-            chro2.create();
 
-            cross_over(mating_pop, chro1, chro2, map);
+            cross_over(mating_pop, chro1, map);
             #ifdef DEBUG
             cout << chro1.get_gnome() <<endl;
-            cout << chro2.get_gnome() <<endl;
             cout << "CROSSOVER done " << endl;
             #endif
 
-            // mutation
-            if (uniform_rand(0, 10) < 2) {
-                // cout << "MUTATION happened" <<endl;
-                chro1.mutate_by_invert();
-            }
-            if (uniform_rand(0, 10) < 2) {
-                // cout << "STRONG MUTATION happened" <<endl;
-                chro2.mutate_by_invert();
-            }
-            #ifdef DEBUG
-            cout << chro1.get_gnome() <<endl;
-            cout << chro2.get_gnome() <<endl;
-            cout << "MUTATION done " << endl;
-            #endif
-
+            // // mutation
+            // if (uniform_rand(0, 10) < 4) {
+            //     // cout << "MUTATION happened" <<endl;
+            //     chro1.mutate_by_invert();
+            // }
             new_population.push_back(chro1);
-            new_population.push_back(chro2);
         }
+        end_time = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(end_time - start_time);
+        cout << "Time taken by CROSSOVER: "
+            << duration.count() << " microseconds" << endl;
+
+        start_time = high_resolution_clock::now();
+        for (int i = 0; i < POPULATION_SIZE; i+=1) {
+            if (uniform_rand(0, 10) < 4) {
+                new_population[i].mutate_by_invert();
+            }
+        }
+        end_time = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(end_time - start_time);
+        cout << "Time taken by MUTATION: "
+            << duration.count() << " microseconds" << endl;
 
         // evaluation
+        start_time = high_resolution_clock::now();
         for (int i = 0; i < new_population.size(); i++) {
             new_population[i].fitness = cal_fitness(map, new_population[i].get_gnome_vec());
             if (new_population[i].fitness < best_seen_chro.fitness) {
@@ -245,6 +243,15 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
                 best_seen_fitness = new_population[i].fitness;
             }
         }
+        end_time = high_resolution_clock::now();
+        duration = duration_cast<microseconds>(end_time - start_time);
+        cout << "Time taken by EVAL: "
+            << duration.count() << " microseconds" << endl;
+
+        duration = duration_cast<microseconds>(end_time - start_time_0);
+        cout << "Total time taken for an iteration: "
+            << duration.count() << " microseconds" << endl;
+        
         // Chromosome mutated_best_seen_chro = best_seen_chro;
         // mutated_best_seen_chro.mutate_by_invert();
         // new_population.push_back(mutated_best_seen_chro);
@@ -286,7 +293,7 @@ void solver(vector<vector<int>> map, int gen_thres, int pop_size) {
 }
 
 int main() {
-    vector<vector<int>> map = load_tsp_from_file("testcase/30.txt");
+    vector<vector<int>> map = load_tsp_from_file(TESTFILE);
     #ifdef DEBUG
     for(int i = 0; i < map.size(); ++i) {
         for (int j = 0; j < map[i].size(); ++j) {
@@ -297,7 +304,7 @@ int main() {
     #endif
     solver(map, GEN_THRES, POPULATION_SIZE);
 
-    // control group
+    // // control group
     // string ans_str = "";
 	// cout << "brute_force result: " << travllingSalesmanProblem(map, 0, ans_str) << " " << ans_str << endl;
     // cout << "greedy result: " << tsp_greedy(map) << endl; // not correct

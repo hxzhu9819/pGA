@@ -1,6 +1,6 @@
 CFLAGS := -std=c++14 -lpthread
 
-CFLAGS += -g
+CFLAGS += -O3
 
 SOURCES := ./*.cpp
 HEADERS := ./*.h

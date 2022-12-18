@@ -98,7 +98,7 @@ void calculate_fitness(Chro* chro, vector<vector<int>>& dist_matrix) {
 }
 
 void calculate_pop_fitness(Chro* pop, vector<vector<int>>& dist_matrix) {
-    #pragma omp parallel for schedule(dynamic) shared(dist_matrix, pop)
+    // #pragma omp parallel for schedule(dynamic) shared(dist_matrix, pop)
     for (int p = 0; p < POPULATION_SIZE; ++p) {
         calculate_fitness(&pop[p], dist_matrix);
         if (pop[p].fitness < best_fitness) {
@@ -177,7 +177,7 @@ void mutate(Chro* chro) {
 }
 
 void cross_over(Chro* pop, Chro* mating_pop, vector<vector<int>>& map) {
-    #pragma omp parallel for schedule(dynamic)
+    // #pragma omp parallel for schedule(dynamic)
     for (int p = 0 ; p < POPULATION_SIZE; p++) {
         int idx1 = uniform_rand(0, MATING_SIZE);
         int idx2 = uniform_rand(0, MATING_SIZE);
@@ -248,7 +248,7 @@ int main() {
     Chro* mating_pop = (Chro*) malloc(MATING_SIZE*sizeof(Chro));
 
     auto start_time = high_resolution_clock::now();
-    #pragma omp parallel for schedule(guided)
+    // #pragma omp parallel for schedule(guided)
     for (int i = 0; i < POPULATION_SIZE; ++i) {
         // cout << "Generating " << i << " chro" << endl;
         create_random_chro(&pop[i], NUM_CITY, map);

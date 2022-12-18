@@ -9,12 +9,22 @@
 #include <stdlib.h>
 #include <vector>
 #include <random>
-#include <omp.h>
 using namespace std;
 
 int rand_num_from_range(int start, int end) {
     return start + rand() % (end - start);
+    // std::random_device rd;
+    // std::mt19937 gen(rd());
+    // std::uniform_int_distribution<> dis(start, end-1);
+    // return dis(gen);
 }
+
+// bool repeat(string s, char c) {
+//     for (auto sc : s) {
+//         if (sc == c) return true;
+//     }
+//     return false;
+// }
 
 bool repeat(vector<int> s, int c) {
     for (auto sc : s) {
@@ -30,7 +40,6 @@ class Chromosome {
     public:
         int fitness;
         int size; // number of city
-        Chromosome();
         Chromosome(int size);
         Chromosome(const Chromosome &t);
         void create();
@@ -45,9 +54,6 @@ class Chromosome {
 
 bool worsethan(Chromosome c1, Chromosome c2) {
     return c1.fitness < c2.fitness;
-}
-
-Chromosome::Chromosome() {
 }
 
 Chromosome::Chromosome(int size) {
@@ -114,7 +120,7 @@ void Chromosome::cross_over(Chromosome& x, Chromosome& y, int p, vector<vector<i
         int p1_cand_idx = get_index(parent1_gnome_vec, new_chro[i-1])+1;
         int p1_cand = parent1_gnome_vec[p1_cand_idx];
         if (p1_cand == 0 || get_index(new_chro, p1_cand) != -1) {
-            for (int j = 1; j < size; ++j) {
+            for (int j = 1; i < size; ++j) {
                 if (get_index(new_chro, j) == -1) {
                     p1_cand = j;
                     break;
@@ -125,7 +131,7 @@ void Chromosome::cross_over(Chromosome& x, Chromosome& y, int p, vector<vector<i
         int p2_cand_idx = get_index(parent2_gnome_vec, new_chro[i-1])+1;
         int p2_cand = parent2_gnome_vec[p2_cand_idx];
         if (p2_cand == 0 || get_index(new_chro, p2_cand) != -1) {
-            for (int j = 1; j < size; ++j) {
+            for (int j = 1; i < size; ++j) {
                 if (get_index(new_chro, j) == -1) {
                     p2_cand = j;
                     break;
@@ -137,7 +143,6 @@ void Chromosome::cross_over(Chromosome& x, Chromosome& y, int p, vector<vector<i
         int p2_fitness = map[new_chro[i-1]][p2_cand];
         new_chro[i] = p1_fitness <= p2_fitness ? p1_cand : p2_cand;
     }
-    gnome_vec = new_chro;
 }
 
 // void Chromosome::cross_over(Chromosome& x, Chromosome& y, int p) {

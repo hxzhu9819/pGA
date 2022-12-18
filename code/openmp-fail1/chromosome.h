@@ -4,26 +4,17 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include <string.h>
 #include <stdlib.h>
 #include <vector>
 #include <random>
+#include <omp.h>
 using namespace std;
 
 int rand_num_from_range(int start, int end) {
     return start + rand() % (end - start);
-    // std::random_device rd;
-    // std::mt19937 gen(rd());
-    // std::uniform_int_distribution<> dis(start, end-1);
-    // return dis(gen);
 }
-
-// bool repeat(string s, char c) {
-//     for (auto sc : s) {
-//         if (sc == c) return true;
-//     }
-//     return false;
-// }
 
 bool repeat(vector<int> s, int c) {
     for (auto sc : s) {
@@ -39,6 +30,7 @@ class Chromosome {
     public:
         int fitness;
         int size; // number of city
+        Chromosome();
         Chromosome(int size);
         Chromosome(const Chromosome &t);
         void create();
@@ -53,6 +45,9 @@ class Chromosome {
 
 bool worsethan(Chromosome c1, Chromosome c2) {
     return c1.fitness < c2.fitness;
+}
+
+Chromosome::Chromosome() {
 }
 
 Chromosome::Chromosome(int size) {

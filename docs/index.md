@@ -10,7 +10,7 @@ We are going to implement and benchmark different parallelizing strategies, incl
 [Milestone Report](https://hxzhu9819.github.io/pGA/milestone)
 
 ## Final Report
-[Final Report](https://hxzhu9819.github.io/pGA/docs/final_report_pGA.pdf)
+[Final Report](https://github.com/hxzhu9819/pGA/blob/web_page/docs/final_report_pGA.pdf)
 
 ### UPDATED SCHEDULE (11/30)
 **Week 1 (11/07 - 11/13)**
